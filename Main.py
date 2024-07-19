@@ -91,16 +91,14 @@ class FaceRecognizer:
                 # Get age prediction
                 if person_id not in self.age_predictions:
                     self.age_predictions[person_id] = {'frames': [], 'age': None}
-                
-                if len(self.age_predictions[person_id]['frames']) < 10:
-                    age = predict_age(face_image, age_model)
-                    self.age_predictions[person_id]['frames'].append(age)
-                else:
-                    if self.age_predictions[person_id]['age'] is None:
-                        most_common_age = Counter(self.age_predictions[person_id]['frames']).most_common(1)[0][0]
-                        self.age_predictions[person_id]['age'] = most_common_age
-                    age = self.age_predictions[person_id]['age']
 
+                age = predict_age(face_image, age_model)
+                self.age_predictions[person_id]['frames'].append(age)
+
+                # Determine the most common age from all frames
+                most_common_age = Counter(self.age_predictions[person_id]['frames']).most_common(1)[0][0]
+                self.age_predictions[person_id]['age'] = most_common_age
+                
                 output_folder = os.path.join(output_dir, f'{video_name}_face')
                 os.makedirs(output_folder, exist_ok=True)
                 # 얼굴 이미지를 160x160으로 리사이즈
